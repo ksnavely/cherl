@@ -9,10 +9,8 @@
 
 %% server
 %%
-%% - Initiates server_users table if it doesn't exist
 %% - Creates a cherl_server OTP application process
 server() ->
-  %% Start the server OTP application
   {ok, Pid} = gen_server:start(?MODULE, [], []),
   register(cherl_server, Pid).
 
@@ -24,14 +22,18 @@ test(Message) ->
 handle_call({create_client, Username, Password}, _From, LoopData) ->
   % Register the username/password with our server_users ETS table
   case ets:lookup(server_users, Username) of
-   [] -> io:format("Did not find ~s, inserting.~n", [Username]),
+   [] -> io:format("[INFO] Did not find ~s, inserting.~n", [Username]),
          ets:insert(server_users, {Username, Password});
-    _ -> io:format("User ~s already exists!~n", [Username])
+    _ -> io:format("[WARNING] User ~s already exists!~n", [Username])
   end,
   {reply, ok, LoopData}.
 
 handle_cast({chat, Username, Password, Message}, LoopData) ->
-  io:format("~s: ~s!~n",[Username, Message]),
+  case ets:lookup(server_users, Username) of
+    [{Username, Password}] -> io:format("~s: ~s!~n", [Username, Message]);
+    [] -> io:format("[WARNING] No such user: ~s~n", [Username]);
+    _ -> io:format("[WARNING] Unauthorized access attempt for: ~s~n", [Username])
+  end,
   {noreply, LoopData}.
 
 init(_Args) ->

@@ -15,3 +15,4 @@ and pass messages about in the shell.
     everything dying and restarting.
   - CLI: Provide a CLI for the client that's not the erlang shell.
   - Packaging: The server should be seperate from the client ;)
+  - Slack integration for servers
