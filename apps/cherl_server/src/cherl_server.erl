@@ -24,8 +24,11 @@
 
 start() ->
   % - Creates a cherl_server OTP application process
+  io:format("start called~n", []),
   {ok, Pid} = gen_server:start(?MODULE, [], []),
-  register(cherl_server, Pid).
+  io:format("Pid ~s~n",[pid_to_list(Pid)]),
+%  register(cherl_server, Pid),
+  io:format("register called~n", []).
 
 %% Non-api functions
 

@@ -1,0 +1,12 @@
+{application, cherl_client,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { cherl_client_app, []}},
+  {env, []}
+ ]}.

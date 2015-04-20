@@ -55,6 +55,8 @@ Chat session started.
 ```
 
 ## TODO
+  - Use rebar for building
+  - Use eunit for basic unit testing
   - Distributed server: Be able to spawn and load balance multiple chat server
     instances. Bonus, do it across computers.
   - Supervision and fault tolerance: Be able to recover from just about
