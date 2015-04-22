@@ -27,8 +27,9 @@ start() ->
   io:format("start called~n", []),
   {ok, Pid} = gen_server:start(?MODULE, [], []),
   io:format("Pid ~s~n",[pid_to_list(Pid)]),
-%  register(cherl_server, Pid),
-  io:format("register called~n", []).
+  register(cherl_server, Pid),
+  io:format("register called~n", []),
+  {ok, Pid}.
 
 %% Non-api functions
 
