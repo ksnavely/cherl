@@ -42,7 +42,7 @@ chat(Username, Message) ->
       {IterUsername, {_, IterNode}} = Entry,
       case Username of
         IterUsername -> Acc; % Don't echo the user's message to themselves
-        _ -> spawn(IterNode, gen_server, cast, [client, {server_message, Username, Message}]),
+        _ -> spawn(IterNode, gen_server, cast, [cherl_client, {server_message, Username, Message}]),
              Acc % Just recycle this accumulator, we don't do anything with it.
       end
     end,
