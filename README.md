@@ -62,11 +62,16 @@ Chat session started.
 => foo: Yes, hello baz how are you?
 ```
 
+## Start your own zombie army:
+I've added hooks to cherl_server.erl so you can spawn your very own chatbot
+army. This still needs load balancing optimization but works. See this
+[gist](https://gist.github.com/ksnavely/cf0c77395b4d4b6da819) for an example
+zombie attack session.
+
 ## TODO
-  - Use rebar for building
   - Use eunit for basic unit testing
   - Distributed server: Be able to spawn and load balance multiple chat server
     instances. Bonus, do it across computers.
-  - Supervision and fault tolerance: Be able to recover from just about
+  - Better supervision and fault tolerance: Be able to recover from just about
     everything dying and restarting.
   - Slack integration for servers

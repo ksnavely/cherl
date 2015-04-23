@@ -16,12 +16,41 @@
 
 -module(cherl_client).
 
--export([cli/0, go/1, login/0, start/3]).
+-export([cli/0, go/1, login/0, start/3, zombies/3]).
 -export([handle_call/3, handle_cast/2, init/1, terminate/2]).
 
 -behavior(gen_server).
 
-%% Client API functions are below.
+%% Zombie army API
+
+zombies(CherlServer, TotalClients, SleepTime) ->
+    % spawn TotalClients worth of client processes, log them in
+    % Have them chat every rand(0.5, SleepTime) seconds
+    Zombies = [make_zombie(CherlServer, N) || N <-lists:seq(0, TotalClients)],
+    zombie_chat_loop(Zombies, SleepTime).
+
+make_zombie(CherlServer, N) ->
+    ZPassword = "zombiepass",
+    io:format("zombie-~B~n", [N]),
+    Id = io_lib:format("zombie-~B", [N]),
+    {ok, Pid} = gen_server:start(?MODULE, {CherlServer, Id, ZPassword}, []),
+    gen_server:call(Pid, {create_client}),
+    {zombie, Id, Pid}.
+
+zombie_chat_loop(Zombies, SleepTime) ->
+    lists:foldl(
+        fun(Zombie, Acc) -> 
+            {zombie, ZId, ZPid} = Zombie,
+            gen_server:cast(ZPid, {zombie_chat, SleepTime}),
+            Acc
+        end,
+        0,
+        Zombies
+    ),
+    timer:sleep(SleepTime),
+    zombie_chat_loop(Zombies, SleepTime).
+
+%% CLI Client API functions are below.
 
 go([CherlServer, UsernameAtom]) ->
   % Display a welcome message, and prompt for a password
@@ -39,6 +68,8 @@ go([CherlServer, UsernameAtom]) ->
 
   % Recursive CLI chat prompt
   cli().
+
+% Supervisor entry point
 
 start(CherlServer, Username, Password) ->
   % Start the client OTP application, and register an handy atom to the pid
@@ -71,7 +102,15 @@ handle_cast({chat, Message}, {CherlServer, Username, Password}) ->
 handle_cast({server_message, Sender, Message}, {CherlServer, Username, Password}) ->
   % The client has received a chat from the server
   io:format("~s: ~s~n", [Sender, Message]),
+  {noreply, {CherlServer, Username, Password}};
+handle_cast({zombie_chat, SleepTime}, {CherlServer, Username, Password}) ->
+  % TODO randome sleep time
+  timer:sleep(SleepTime),
+  % Send a zombie chat message to the server
+  Message = "zombie chat",
+  spawn(CherlServer, gen_server, cast, [cherl_server, {chat, Username, Password, Message}]),
   {noreply, {CherlServer, Username, Password}}.
+   
 
 init({CherlServer, Username, Password}) ->
   % The username and password are used as loop data for authentication with
