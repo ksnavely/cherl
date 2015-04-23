@@ -30,7 +30,7 @@ zombies([CherlServer, TotalClientsAtom, SleepTimeAtom]) ->
     {SleepTime, []} = string:to_integer(atom_to_list(SleepTimeAtom)),
 
     io:format(
-        "Building zombie army.~n  Host: ~s~n  Total Clients: ~s~n Sleep Ceiling: ~s~n~n",
+        "Building zombie army.~n  Host: ~s~n  Total Clients: ~s~n  Sleep Ceiling: ~s~n~n",
         [CherlServer, integer_to_list(TotalClients), integer_to_list(SleepTime)]
     ),
     Zombies = [make_zombie(CherlServer, N) || N <-lists:seq(1, TotalClients)],

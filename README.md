@@ -70,7 +70,8 @@ army. This still needs load balancing optimization but works.
 
 ### Starting a zombie swarm
 
-Start a client with: `./zombies.sh SWARM_SHORT_NAME FULL_SERVER_NODE_NAME TOTAL_CLIENTS SLEEP_TIME`.
+Start a set of cherl clients  with: 
+`./zombies.sh SWARM_SHORT_NAME FULL_SERVER_NODE_NAME TOTAL_CLIENTS SLEEP_TIME`.
 Each time the horde ticks by `SLEEP_TIME` milliseconds, the stdout will update. Check out the chat server
 logs for some action from the horde.
 
@@ -90,7 +91,7 @@ logs for some action from the horde.
 
 ───────────────────────────────────────────────────────────────────────────────
 
-[00:02:14 cherl] (master)./zombies.sh zserv 'chatserver@WKSTN0011' 2 2000
+[00:09:44 cherl] (master)./zombies.sh zserv 'chatserver@WKSTN0011' 2 2000
 Building zombie army.
   Host: chatserver@WKSTN0011
   Total Clients: 2
