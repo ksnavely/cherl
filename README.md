@@ -8,7 +8,7 @@ working on this locally and remote erlang nodes may require additional work.
 
 The code is packaged as multiple OTP applications in the apps/ directory.
   - cherl_server: supervised single master chat server
-  - cherl_client: supervised chat client, CLI entry point in module
+  - cherl_client: supervised chat client, CLI and zombie-load entry points in module
 
 ## Usage examples
 
