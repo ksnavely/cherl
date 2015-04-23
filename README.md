@@ -65,7 +65,7 @@ Chat session started.
 
 ## Command your own zombie army
 
-I've added hooks to cherl_server.erl so you can spawn your very own chatbot
+I've added hooks to cherl_client.erl so you can spawn your very own chatbot
 army. This still needs load balancing optimization but works. See this
 [gist](https://gist.github.com/ksnavely/cf0c77395b4d4b6da819) for an example
 zombie attack session.
