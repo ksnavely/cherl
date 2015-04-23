@@ -6,7 +6,15 @@ The chat and client are OTP applications. You can create a single chat server
 and start client processes to interact with the chat server. I've only been
 working on this locally and remote erlang nodes may require additional work.
 
+The code is packaged as multiple OTP applications in the apps/ directory.
+  - cherl_server: supervised single master chat server
+  - cherl_client: supervised chat client, CLI entry point in module
+
 ## Usage examples
+
+### Compiling the code
+
+If you update the code compile the erlang with `rebar compile`.
 
 ### Starting the server
 
