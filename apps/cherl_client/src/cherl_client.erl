@@ -16,28 +16,39 @@
 
 -module(cherl_client).
 
--export([cli/0, go/1, login/0, start/3, zombies/3]).
+-export([cli/0, go/1, login/0, start/3, zombies/1]).
 -export([handle_call/3, handle_cast/2, init/1, terminate/2]).
 
 -behavior(gen_server).
 
 %% Zombie army API
 
-zombies(CherlServer, TotalClients, SleepTime) ->
+zombies([CherlServer, TotalClientsAtom, SleepTimeAtom]) ->
     % spawn TotalClients worth of client processes, log them in
-    % Have them chat every rand(0.5, SleepTime) seconds
-    Zombies = [make_zombie(CherlServer, N) || N <-lists:seq(0, TotalClients)],
-    zombie_chat_loop(Zombies, SleepTime).
+    % they'll chat uniformly over a period of SleepTime milliseconds
+    {TotalClients, []} = string:to_integer(atom_to_list(TotalClientsAtom)),
+    {SleepTime, []} = string:to_integer(atom_to_list(SleepTimeAtom)),
+
+    io:format(
+        "Building zombie army.~n  Host: ~s~n  Total Clients: ~s~n Sleep Ceiling: ~s~n~n",
+        [CherlServer, integer_to_list(TotalClients), integer_to_list(SleepTime)]
+    ),
+    Zombies = [make_zombie(CherlServer, N) || N <-lists:seq(1, TotalClients)],
+    zombie_chat_loop(Zombies, SleepTime, 1).
 
 make_zombie(CherlServer, N) ->
     ZPassword = "zombiepass",
-    io:format("zombie-~B~n", [N]),
     Id = io_lib:format("zombie-~B", [N]),
     {ok, Pid} = gen_server:start(?MODULE, {CherlServer, Id, ZPassword}, []),
     gen_server:call(Pid, {create_client}),
     {zombie, Id, Pid}.
 
-zombie_chat_loop(Zombies, SleepTime) ->
+zombie_chat_loop(Zombies, SleepTime, Acc) ->
+    % Fire off callbacks for randomly timed zombie chats
+    %   Zombies: list of {zombie, ZId, ZPid} tuples
+    %   SleepTime: Sleep ceiling in ms
+    %   Acc: recurse counter
+    io:format("The zombie horde stirs... [~B]~n", [Acc]),
     lists:foldl(
         fun(Zombie, Acc) -> 
             {zombie, ZId, ZPid} = Zombie,
@@ -47,8 +58,10 @@ zombie_chat_loop(Zombies, SleepTime) ->
         0,
         Zombies
     ),
+    % Now wait the full sleep time, so ~all callbacks complete
+    % randomly/uniformly. Then recurse and bump the call counter.
     timer:sleep(SleepTime),
-    zombie_chat_loop(Zombies, SleepTime).
+    zombie_chat_loop(Zombies, SleepTime, Acc + 1).
 
 %% CLI Client API functions are below.
 
@@ -105,7 +118,7 @@ handle_cast({server_message, Sender, Message}, {CherlServer, Username, Password}
   {noreply, {CherlServer, Username, Password}};
 handle_cast({zombie_chat, SleepTime}, {CherlServer, Username, Password}) ->
   % TODO randome sleep time
-  timer:sleep(SleepTime),
+  timer:sleep(random:uniform(SleepTime)),
   % Send a zombie chat message to the server
   Message = "zombie chat",
   spawn(CherlServer, gen_server, cast, [cherl_server, {chat, Username, Password, Message}]),

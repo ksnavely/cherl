@@ -24,11 +24,9 @@
 
 start() ->
   % - Creates a cherl_server OTP application process
-  io:format("start called~n", []),
   {ok, Pid} = gen_server:start(?MODULE, [], []),
-  io:format("Pid ~s~n",[pid_to_list(Pid)]),
   register(cherl_server, Pid),
-  io:format("register called~n", []),
+  io:format("[INFO] cherl_server has been started with pid: ~s.~n", [pid_to_list(Pid)]),
   {ok, Pid}.
 
 %% Non-api functions
@@ -57,7 +55,8 @@ handle_call({create_client, Username, Password, Node}, _From, LoopData) ->
   case ets:lookup(server_users, Username) of
    [] -> io:format("[INFO] Did not find ~s, inserting.~n", [Username]),
          ets:insert(server_users, {Username, {Password, Node}});
-   {Username, {Password, Node}} -> io:format("[INFO] User ~s has reconnected.~n", [Username]);
+   {Username, {Password, _}} -> io:format("[INFO] User ~s has reconnected. Updating node info.~n", [Username]),
+                                ets:insert(server_users, {Username, {Password, Node}});
     _ -> io:format("[WARNING] User ~s already exists, and authentication failed!~n", [Username])
   end,
   {reply, ok, LoopData}.
