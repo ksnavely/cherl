@@ -14,7 +14,7 @@ The code is packaged as multiple OTP applications in the apps/ directory.
 
 ### Compiling the code
 
-If you update the code compile the erlang with `rebar compile`.
+If you update the code compile the erlang by running `rebar compile` in the parent directory. If you are in the same directory as the .erl files you can use `erlc` or `c(...)` in the repl.
 
 ### Starting the server
 
