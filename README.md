@@ -95,7 +95,7 @@ logs for some action from the horde.
 Building zombie army.
   Host: chatserver@WKSTN0011
   Total Clients: 2
- Sleep Ceiling: 2000
+  Sleep Ceiling: 2000
 
 The zombie horde stirs... [1]
 The zombie horde stirs... [2]
