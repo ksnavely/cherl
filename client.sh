@@ -1,4 +1,2 @@
 #!/bin/bash
-cd src
-erlc cherl_client.erl
-erl -sname $1 -s cherl_client start $2 $3 -noshell
+erl -sname $1 -pa apps/cherl_client/ebin -s cherl_client go $2 $3 -noshell

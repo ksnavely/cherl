@@ -16,14 +16,14 @@
 
 -module(cherl_client).
 
--export([cli/0, go/2, login/0, start/3]).
+-export([cli/0, go/1, login/0, start/3]).
 -export([handle_call/3, handle_cast/2, init/1, terminate/2]).
 
 -behavior(gen_server).
 
 %% Client API functions are below.
 
-go(CherlServer, UsernameAtom) ->
+go([CherlServer, UsernameAtom]) ->
   % Display a welcome message, and prompt for a password
   Username = atom_to_list(UsernameAtom),
   io:format("~nWelcome ~s! You will be connected to the cherl server at ~s.~nAll newlines and tabs will be stripped from passwords and chats.~n", [Username, CherlServer]),
@@ -35,7 +35,7 @@ go(CherlServer, UsernameAtom) ->
 
   % Attempt login/user creation
   login(),
-  io:format("Login complete.~n~n", []),
+  io:format("Login complete.~n", []),
 
   % Recursive CLI chat prompt
   cli().

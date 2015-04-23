@@ -1,4 +1,2 @@
 #!/bin/bash
-cd src
-erlc cherl_server.erl
-erl -sname $1 -s cherl_server start -noshell
+erl -sname $1 -pa apps/cherl_server/ebin -s cherl_server start -noshell
