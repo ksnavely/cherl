@@ -33,7 +33,7 @@ start(Module, Port, Loop) ->
 
 init(State = #server_state{port = Port, loop = Loop}) ->
     % Open up a socket
-    {ok, ListenSocket} = ssl:listen(9999, [{certfile, "/home/ksnavely/programming/localhost-certs/localhost.crt"}, {keyfile, "/home/ksnavely/programming/localhost-certs/localhost.key"}, {reuseaddr, true}]),
+    {ok, ListenSocket} = ssl:listen(9999, [{mode, binary}, {certfile, "/home/ksnavely/programming/localhost-certs/localhost.crt"}, {keyfile, "/home/ksnavely/programming/localhost-certs/localhost.key"}, {reuseaddr, true}]),
     State2 = State#server_state{ssl_sock = ListenSocket},
     % Kick off the initial connection
     {ok, accept(State2)}.
@@ -57,11 +57,26 @@ accept_loop({Pid, ListenSocket, {M, F} = Loop}) ->
     % Work with the connection
     M:F(ListenSocket2).
 
-fake_cherl_server(Socket) ->
-    ssl:send(Socket, "test message"),
-    % Recv or something
-    timer:sleep(1000),
-    fake_cherl_server(Socket).
+ssl_server(Socket) ->
+%    ssl:send(Socket, <<"test message">>),
+%    % Recv or something
+%    timer:sleep(1000),
+%    fake_cherl_server(Socket).
+    % Receive all data from a packet
+    ssl:recv(Socket, 0) ->
+        {ok, BinaryData} -> 
+			Term = binary_to_term(BinaryData),
+            handle_packet(Term),
+            ssl_server(Socket);
+        {error, closed} -> ok
+    end.
+
+% After receiving and decoding a packet, hand off the
+% message to cherl_server
+handle_term({chat, Username, Password, Msg} = Term) ->
+    gen_server:cast(cherl_server, Term);
+handle_term({create_client, Username, Password, Socket} = Term) ->
+    gen_server:call(cherl_server, Term).
 
 test() ->
     start(?MODULE, 9999, {?MODULE, fake_cherl_server}).
